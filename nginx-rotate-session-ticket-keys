@@ -1,15 +1,24 @@
-#!/bin/bash
+#!/bin/sh
 
-set -o errexit -o nounset -o pipefail
+set -o errexit -o nounset
 
 umask 077
 
 cd /etc/nginx/session-ticket-keys
 
-rsync -It 2.key 1.key
-rsync -It 3.key 2.key
-rsync -It 4.key 3.key
-openssl rand -out new.key 80
-rsync -It new.key 4.key
-rm new.key
-nginx -s reload
+# use /dev/random instead of urandom in case urandom hasn't been seeded
+# on modern kernels it is good enough for our purposes
+dd ibs=1 obs=1 count='80' 2>/dev/null </dev/random >5.key
+
+for i in 1 2 3 4; do
+	# rotate keys but preserve timestamps
+	# use a tmpfile to ensure that operations are atomic; there's never a missing key
+	cp -p "$((i + 1)).key" tmp.key
+	mv tmp.key "$i.key"
+done
+
+rm 5.key
+
+if [ "$#" -gt 0 ]; then
+	[ "$1" = '-r' ] && nginx -s reload
+fi
