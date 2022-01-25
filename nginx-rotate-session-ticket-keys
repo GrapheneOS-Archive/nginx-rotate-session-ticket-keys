@@ -6,13 +6,18 @@ umask 077
 
 cd /etc/nginx/session-ticket-keys
 
-for i in 1 2 3; do
-	cp -p "$((i + 1)).key" "$i.key"
-done
-
 # use /dev/random instead of urandom in case urandom hasn't been seeded
 # on modern kernels it is good enough for our purposes
-dd ibs=1 obs=1 count='80' 2>/dev/null </dev/random >4.key
+dd ibs=1 obs=1 count='80' 2>/dev/null </dev/random >5.key
+
+for i in 1 2 3 4; do
+	# rotate keys but preserve timestamps
+	# use a tmpfile to ensure that operations are atomic; there's never a missing key
+	cp -p "$((i + 1)).key" tmp.key
+	mv tmp.key "$i.key"
+done
+
+rm 5.key
 
 if [ "$#" -gt 0 ]; then
 	[ "$1" = '-r' ] && nginx -s reload
