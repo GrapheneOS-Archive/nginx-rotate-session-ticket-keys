@@ -25,7 +25,7 @@ RestrictSUIDSGID=true
 
 
 DevicePolicy=strict
-DeviceAllow=/dev/urandom r
+DeviceAllow=/dev/random r
 DeviceAllow=/dev/null w
 DeviceAllow=/dev/stdin r
 

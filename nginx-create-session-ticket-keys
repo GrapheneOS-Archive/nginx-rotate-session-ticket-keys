@@ -8,5 +8,7 @@ mkdir -p /etc/nginx/session-ticket-keys
 mount -t ramfs -o mode=700 ramfs /etc/nginx/session-ticket-keys
 
 for i in 1 2 3 4; do
-	dd ibs=1 obs=1 count='80' 2>/dev/null </dev/urandom >"/etc/nginx/session-ticket-keys/$i.key"
+	# use /dev/random instead of urandom in case urandom hasn't been seeded
+	# on modern kernels it is good enough for our purposes
+	dd ibs=1 obs=1 count='80' 2>/dev/null </dev/random >"/etc/nginx/session-ticket-keys/$i.key"
 done

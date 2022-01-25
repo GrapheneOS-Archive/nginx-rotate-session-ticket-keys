@@ -10,7 +10,9 @@ for i in 1 2 3; do
 	cp -p "$((i + 1)).key" "$i.key"
 done
 
-dd ibs=1 obs=1 count='80' 2>/dev/null </dev/urandom >4.key
+# use /dev/random instead of urandom in case urandom hasn't been seeded
+# on modern kernels it is good enough for our purposes
+dd ibs=1 obs=1 count='80' 2>/dev/null </dev/random >4.key
 
 if [ "$#" -gt 0 ]; then
 	[ "$1" = '-r' ] && nginx -s reload
