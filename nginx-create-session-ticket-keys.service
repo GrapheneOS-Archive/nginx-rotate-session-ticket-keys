@@ -1,6 +1,7 @@
 [Unit]
 Description=Create nginx TLS session ticket keys
 Before=nginx.service
+After=etc-nginx-session_ticket_keys.mount
 
 [Service]
 Type=oneshot
@@ -8,5 +9,46 @@ User=root
 Group=root
 ExecStart=/usr/local/bin/nginx-create-session-ticket-keys
 
-[Install]
-WantedBy=multi-user.target
+PrivateDevices=true
+PrivateIPC=true
+PrivateNetwork=true
+PrivateTmp=true
+PrivateUsers=true
+
+# limit privs
+CapabilityBoundingSet=
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+RemoveIPC=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+IPAddressDeny=any
+
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=yes
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProcSubset=pid
+
+DevicePolicy=strict
+DeviceAllow=/dev/random r
+DeviceAllow=/dev/urandom r
+DeviceAllow=/dev/stdin r
+
+ProtectClock=true
+
+# filesystem restrictions
+ProtectSystem=strict
+ReadWritePaths=/etc/nginx/session_ticket_keys
+UMask=0077
+
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@clock @debug @module @mount @reboot @swap @resources @cpu-emulation @obsolete @raw-io @obsolete @keyring @privileged

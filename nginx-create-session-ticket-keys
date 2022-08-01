@@ -4,10 +4,7 @@ set -o errexit -o nounset -o pipefail
 
 umask 077
 
-mkdir -p /etc/nginx/session-ticket-keys
-mount -t ramfs -o mode=700 ramfs /etc/nginx/session-ticket-keys
-
-cd /etc/nginx/session-ticket-keys
+cd /etc/nginx/session_ticket_keys
 
 openssl rand -out 1.key 80
 openssl rand -out 2.key 80
